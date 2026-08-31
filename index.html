@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>7-ELEVEN POS 條碼與繳費單系統</title>
+    <title>7-ELEVEN POS 條碼、繳費單與兌換券系統</title>
     
     <!-- PWA / Web App 設定 -->
     <meta name="theme-color" content="#0f172a">
@@ -60,7 +60,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-base md:text-lg leading-tight text-slate-900">7-ELEVEN POS Web App</h1>
-                    <p class="text-[11px] text-slate-500">商品條碼與三段式繳費單生成器</p>
+                    <p class="text-[11px] text-slate-500">商品條碼 / 繳費單 / 電子兌換券生成器</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -82,8 +82,6 @@
         <!-- 相機掃描彈窗 Modal -->
         <div id="scannerModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print">
             <div class="bg-slate-900 text-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-800">
-                
-                <!-- 標題與關閉按鈕 -->
                 <div class="px-5 py-3.5 border-b border-slate-800 flex justify-between items-center bg-slate-900/90">
                     <div class="flex items-center space-x-2">
                         <span id="scanStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
@@ -92,12 +90,9 @@
                     <button onclick="stopScanner()" class="text-slate-400 hover:text-white text-lg font-bold p-1 rounded-lg hover:bg-slate-800 transition">✕</button>
                 </div>
 
-                <!-- 鏡頭畫面與對焦區 -->
                 <div class="p-4 flex flex-col items-center">
                     <div class="w-full h-64 bg-black rounded-xl overflow-hidden relative border border-slate-800 flex items-center justify-center">
                         <video id="scannerVideo" class="w-full h-full object-cover" playsinline muted></video>
-                        
-                        <!-- 掃描瞄準框 -->
                         <div id="scanTargetBox" class="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div class="w-4/5 h-32 border-2 border-emerald-400/80 rounded-lg relative shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                                 <div class="absolute -top-1 -left-1 w-4 h-4 border-t-4 border-l-4 border-emerald-400"></div>
@@ -108,13 +103,11 @@
                             </div>
                         </div>
 
-                        <!-- 狀態提示 -->
                         <div id="scannerStatus" class="absolute bottom-3 bg-slate-950/85 text-emerald-400 text-xs px-3 py-1.5 rounded-full border border-emerald-500/30 font-medium text-center max-w-[90%] truncate">
                             正在初始化相機...
                         </div>
                     </div>
 
-                    <!-- 鏡頭選擇器與模擬按鈕 -->
                     <div class="w-full mt-3 flex items-center justify-between gap-2">
                         <select id="cameraSelect" onchange="changeCamera(this.value)" class="flex-1 bg-slate-800 text-xs text-slate-300 border border-slate-700 rounded-lg px-2.5 py-2 outline-none focus:border-emerald-500">
                             <option value="">載入鏡頭中...</option>
@@ -127,7 +120,7 @@
             </div>
         </div>
 
-        <!-- 主主卡片：條碼與參數設定區 -->
+        <!-- 主卡片：條碼與參數設定區 -->
         <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-container">
             
             <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
@@ -150,7 +143,7 @@
                     <div class="flex justify-between items-center text-xs font-bold text-slate-700 border-b border-slate-200 pb-2">
                         <span class="flex items-center space-x-1.5">
                             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                            <span>快速參數設定</span>
+                            <span>單號類型選擇與設定</span>
                         </span>
                         <button onclick="fillSampleData()" class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold underline active:opacity-75">帶入預設範例</button>
                     </div>
@@ -162,10 +155,11 @@
                                 class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
                                 <option value="goods" selected>商品 (Goods)</option>
                                 <option value="utility">繳費單 (Utility)</option>
+                                <option value="egtc">電子兌換券 (EGTC)</option>
                             </select>
                         </div>
 
-                        <!-- 商品模式 -->
+                        <!-- 商品模式面板 -->
                         <div id="goodsConfig" class="sm:col-span-12 grid grid-cols-1 sm:grid-cols-12 gap-3">
                             <div class="sm:col-span-12">
                                 <label class="block text-[11px] font-semibold text-slate-500 mb-1">一維條碼格式 (Format)</label>
@@ -195,7 +189,7 @@
                             </div>
                         </div>
 
-                        <!-- 繳費單模式 -->
+                        <!-- 繳費單模式面板 -->
                         <div id="utilityConfig" class="sm:col-span-12 grid grid-cols-1 gap-3 hidden">
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-500 mb-1">第一段條碼 (Code 1)</label>
@@ -210,6 +204,20 @@
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-500 mb-1">第三段條碼 (Code 3)</label>
                                 <input type="text" id="inputCode3" value="" placeholder="(選填，若無可留空)" oninput="updateFromForm()"
+                                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
+                            </div>
+                        </div>
+
+                        <!-- 兌換券 (EGTC) 模式面板 -->
+                        <div id="egtcConfig" class="sm:col-span-12 grid grid-cols-1 gap-3 hidden">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">兌換券主條碼 (Barcode 1 - 16位數字)</label>
+                                <input type="text" id="inputEgtcBarcode1" value="7500088501181646" oninput="updateFromForm()"
+                                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">兌換券驗證碼 (Barcode 2 - 8位英文數字)</label>
+                                <input type="text" id="inputEgtcBarcode2" value="GKGE047D" oninput="updateFromForm()"
                                     class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
                             </div>
                         </div>
@@ -231,9 +239,13 @@
                             </div>
                             
                             <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center min-h-[160px] space-y-4" id="barcode1DContainer">
+                                
+                                <!-- 單一條碼 (Goods) -->
                                 <div id="singleBarcodeWrapper" class="w-full flex flex-col items-center">
                                     <svg id="barcode1D" class="max-w-full"></svg>
                                 </div>
+
+                                <!-- 繳費單條碼 (Utility) -->
                                 <div id="utilityBarcodesWrapper" class="w-full flex flex-col items-center space-y-3 hidden">
                                     <div class="w-full flex flex-col items-center">
                                         <span class="text-[10px] text-slate-400 mb-0.5">Code 1</span>
@@ -248,8 +260,21 @@
                                         <svg id="barcodeCode3" class="max-w-full"></svg>
                                     </div>
                                 </div>
+
+                                <!-- 兌換券條碼 (EGTC) -->
+                                <div id="egtcBarcodesWrapper" class="w-full flex flex-col items-center space-y-3 hidden">
+                                    <div class="w-full flex flex-col items-center">
+                                        <span class="text-[10px] text-slate-400 mb-0.5">Barcode 1 (兌換券號)</span>
+                                        <svg id="barcodeEgtc1" class="max-w-full"></svg>
+                                    </div>
+                                    <div class="w-full flex flex-col items-center">
+                                        <span class="text-[10px] text-slate-400 mb-0.5">Barcode 2 (驗證碼)</span>
+                                        <svg id="barcodeEgtc2" class="max-w-full"></svg>
+                                    </div>
+                                </div>
+
                                 <div id="barcodeErrorMsg" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg w-full text-center font-medium">
-                                    條碼格式或長度錯誤
+                                    條碼格式或長度錯誤 (EAN-8 需為 7 或 8 位數字)
                                 </div>
                             </div>
                         </div>
@@ -286,10 +311,11 @@
     <!-- JS 邏輯處理 -->
     <script>
         let currentType = 'goods';
-        let currentBarcodeFormat = 'EAN8';
+        let currentBarcodeFormat = 'EAN8'; // 預設為 EAN-8
         let codeReader = null;
         let selectedDeviceId = null;
 
+        // 預設 Goods 商品 JSON Payload
         let currentPayload = {
             "Goods": [
                 {
@@ -401,7 +427,7 @@
 
         function simulateScan() {
             stopScanner();
-            const mockBarcode = "4710088411234";
+            const mockBarcode = '{"Goods":[{"Commodity":[{"Device":"POS","Barcode":20719128,"Quantity":1}]}]}';
             handleScannedResult(mockBarcode);
         }
 
@@ -423,6 +449,8 @@
                     } else {
                         setBarcodeFormat('CODE128');
                     }
+                } else if (currentType === 'egtc') {
+                    document.getElementById('inputEgtcBarcode1').value = cleanText;
                 } else {
                     document.getElementById('inputCode1').value = cleanText;
                 }
@@ -432,23 +460,37 @@
 
         function changeType(type) {
             currentType = type;
-            document.getElementById('typeBadge').innerText = type === 'goods' ? '商品條碼' : '繳費單';
-            document.getElementById('displayMode').innerText = type === 'goods' ? '商品交易' : '繳費單據';
+            const badgeEl = document.getElementById('typeBadge');
+            const displayEl = document.getElementById('displayMode');
+
+            // 隱藏所有配置與條碼容器
+            document.getElementById('goodsConfig').classList.add('hidden');
+            document.getElementById('utilityConfig').classList.add('hidden');
+            document.getElementById('egtcConfig').classList.add('hidden');
+            document.getElementById('singleBarcodeWrapper').classList.add('hidden');
+            document.getElementById('utilityBarcodesWrapper').classList.add('hidden');
+            document.getElementById('egtcBarcodesWrapper').classList.add('hidden');
+            document.getElementById('barcodeValTextWrapper').classList.remove('hidden');
 
             if (type === 'goods') {
+                badgeEl.innerText = '商品條碼';
+                displayEl.innerText = '商品交易';
                 document.getElementById('goodsConfig').classList.remove('hidden');
-                document.getElementById('utilityConfig').classList.add('hidden');
                 document.getElementById('singleBarcodeWrapper').classList.remove('hidden');
-                document.getElementById('utilityBarcodesWrapper').classList.add('hidden');
-                document.getElementById('barcodeValTextWrapper').classList.remove('hidden');
                 document.getElementById('formatLabel').innerText = currentBarcodeFormat;
-            } else {
-                document.getElementById('goodsConfig').classList.add('hidden');
+            } else if (type === 'utility') {
+                badgeEl.innerText = '繳費單';
+                displayEl.innerText = '繳費單據';
                 document.getElementById('utilityConfig').classList.remove('hidden');
-                document.getElementById('singleBarcodeWrapper').classList.add('hidden');
                 document.getElementById('utilityBarcodesWrapper').classList.remove('hidden');
                 document.getElementById('barcodeValTextWrapper').classList.add('hidden');
                 document.getElementById('formatLabel').innerText = 'CODE128 (三段)';
+            } else if (type === 'egtc') {
+                badgeEl.innerText = '電子兌換券';
+                displayEl.innerText = '電子兌換券 (EGTC)';
+                document.getElementById('egtcConfig').classList.remove('hidden');
+                document.getElementById('egtcBarcodesWrapper').classList.remove('hidden');
+                document.getElementById('formatLabel').innerText = 'CODE128 (雙條碼)';
             }
 
             updateFromForm();
@@ -464,10 +506,13 @@
         function fillSampleData() {
             if (currentType === 'goods') {
                 document.getElementById('inputBarcode').value = currentBarcodeFormat === 'EAN13' ? "4710088411234" : "20719128";
-            } else {
+            } else if (currentType === 'utility') {
                 document.getElementById('inputCode1').value = "131201788";
                 document.getElementById('inputCode2').value = "9524294830000049";
                 document.getElementById('inputCode3').value = "";
+            } else if (currentType === 'egtc') {
+                document.getElementById('inputEgtcBarcode1').value = "7500088501181646";
+                document.getElementById('inputEgtcBarcode2').value = "GKGE047D";
             }
             updateFromForm();
         }
@@ -480,6 +525,7 @@
                 let rawBarcodeVal = String(commodity.Barcode !== undefined ? commodity.Barcode : "20719128");
 
                 let targetVal = rawBarcodeVal;
+                // 自動補齊 EAN-8 / EAN-13 檢查碼邏輯
                 if (currentBarcodeFormat === 'EAN8' && rawBarcodeVal.length === 7) {
                     let sum = 0;
                     for(let i=0; i<7; i++) sum += parseInt(rawBarcodeVal[i]) * (i % 2 === 0 ? 3 : 1);
@@ -492,13 +538,13 @@
 
                 document.getElementById('barcodeValText').innerText = targetVal;
                 try {
-                    JsBarcode("#barcode1D", targetVal, { format: currentBarcodeFormat, lineColor: "#000000", width: 2, height: 60, displayValue: true, fontSize: 13, margin: 2 });
+                    JsBarcode("#barcode1D", targetVal, { format: currentBarcodeFormat, lineColor: "#000000", width: 2, height: 65, displayValue: true, fontSize: 13, margin: 2 });
                     document.getElementById('barcode1D').style.display = "block";
                 } catch (e) {
                     document.getElementById('barcode1D').style.display = "none";
                     document.getElementById('barcodeErrorMsg').classList.remove('hidden');
                 }
-            } else {
+            } else if (currentType === 'utility') {
                 const ordinary = currentPayload?.Utility?.[0]?.Ordinary?.[0] || {};
                 const c1 = ordinary.code1 || "";
                 const c2 = ordinary.code2 || "";
@@ -517,6 +563,19 @@
                 } catch (e) {
                     document.getElementById('barcodeErrorMsg').classList.remove('hidden');
                 }
+            } else if (currentType === 'egtc') {
+                const egtcData = currentPayload?.Payment?.[0]?.EGTC?.[0] || {};
+                const b1 = egtcData.Barcode1 || "";
+                const b2 = egtcData.Barcode2 || "";
+
+                document.getElementById('barcodeValText').innerText = b1;
+
+                try {
+                    if (b1) JsBarcode("#barcodeEgtc1", b1, { format: "CODE128", width: 1.6, height: 45, displayValue: true, fontSize: 11, margin: 2 });
+                    if (b2) JsBarcode("#barcodeEgtc2", b2, { format: "CODE128", width: 1.8, height: 45, displayValue: true, fontSize: 11, margin: 2 });
+                } catch (e) {
+                    document.getElementById('barcodeErrorMsg').classList.remove('hidden');
+                }
             }
 
             const jsonStr = JSON.stringify(currentPayload);
@@ -526,7 +585,14 @@
         }
 
         function syncFormFromPayload() {
-            if (currentPayload.Utility) {
+            if (currentPayload.Payment && currentPayload.Payment[0]?.EGTC) {
+                currentType = 'egtc';
+                document.getElementById('selectType').value = 'egtc';
+                const egtcData = currentPayload.Payment[0].EGTC[0] || {};
+                document.getElementById('inputEgtcBarcode1').value = egtcData.Barcode1 || "";
+                document.getElementById('inputEgtcBarcode2').value = egtcData.Barcode2 || "";
+                changeType('egtc');
+            } else if (currentPayload.Utility) {
                 currentType = 'utility';
                 document.getElementById('selectType').value = 'utility';
                 const ordinary = currentPayload.Utility[0]?.Ordinary?.[0] || {};
@@ -561,7 +627,7 @@
                         }
                     ]
                 };
-            } else {
+            } else if (currentType === 'utility') {
                 const c1 = document.getElementById('inputCode1').value.trim();
                 const c2 = document.getElementById('inputCode2').value.trim();
                 const c3 = document.getElementById('inputCode3').value.trim();
@@ -574,6 +640,22 @@
                                     "code1": c1,
                                     "code2": c2,
                                     "code3": c3
+                                }
+                            ]
+                        }
+                    ]
+                };
+            } else if (currentType === 'egtc') {
+                const b1 = document.getElementById('inputEgtcBarcode1').value.trim();
+                const b2 = document.getElementById('inputEgtcBarcode2').value.trim();
+                currentPayload = {
+                    "Payment": [
+                        {
+                            "EGTC": [
+                                {
+                                    "Device": "POS",
+                                    "Barcode1": b1,
+                                    "Barcode2": b2
                                 }
                             ]
                         }
