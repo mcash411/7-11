@@ -175,17 +175,11 @@
                                 <input type="text" id="inputBarcode" value="20719128" oninput="updateFromForm()"
                                     class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
                             </div>
+                            <!-- 數量改為手動輸入框 (Input Number) -->
                             <div class="sm:col-span-4">
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">數量 (Quantity)</label>
-                                <select id="inputQty" onchange="updateFromForm()"
-                                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs">
-                                    <option value="1" selected>1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                </select>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">數量 (Quantity: 1-99)</label>
+                                <input type="number" id="inputQty" value="1" min="1" max="99" oninput="updateFromForm()"
+                                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none shadow-xs" placeholder="手動輸入數量">
                             </div>
                         </div>
 
@@ -311,11 +305,10 @@
     <!-- JS 邏輯處理 -->
     <script>
         let currentType = 'goods';
-        let currentBarcodeFormat = 'EAN8'; // 預設為 EAN-8
+        let currentBarcodeFormat = 'EAN8';
         let codeReader = null;
         let selectedDeviceId = null;
 
-        // 預設 Goods 商品 JSON Payload
         let currentPayload = {
             "Goods": [
                 {
@@ -463,7 +456,6 @@
             const badgeEl = document.getElementById('typeBadge');
             const displayEl = document.getElementById('displayMode');
 
-            // 隱藏所有配置與條碼容器
             document.getElementById('goodsConfig').classList.add('hidden');
             document.getElementById('utilityConfig').classList.add('hidden');
             document.getElementById('egtcConfig').classList.add('hidden');
@@ -506,6 +498,7 @@
         function fillSampleData() {
             if (currentType === 'goods') {
                 document.getElementById('inputBarcode').value = currentBarcodeFormat === 'EAN13' ? "4710088411234" : "20719128";
+                document.getElementById('inputQty').value = "1";
             } else if (currentType === 'utility') {
                 document.getElementById('inputCode1').value = "131201788";
                 document.getElementById('inputCode2').value = "9524294830000049";
@@ -525,7 +518,6 @@
                 let rawBarcodeVal = String(commodity.Barcode !== undefined ? commodity.Barcode : "20719128");
 
                 let targetVal = rawBarcodeVal;
-                // 自動補齊 EAN-8 / EAN-13 檢查碼邏輯
                 if (currentBarcodeFormat === 'EAN8' && rawBarcodeVal.length === 7) {
                     let sum = 0;
                     for(let i=0; i<7; i++) sum += parseInt(rawBarcodeVal[i]) * (i % 2 === 0 ? 3 : 1);
@@ -613,7 +605,15 @@
         function updateFromForm() {
             if (currentType === 'goods') {
                 const bc = document.getElementById('inputBarcode').value;
-                const qty = Number(document.getElementById('inputQty').value) || 1;
+                let parsedQty = parseInt(document.getElementById('inputQty').value, 10);
+                
+                // 數量手寫防呆處理：為空或非數字時預設為 1，限制在 1 ~ 99 之間
+                if (isNaN(parsedQty) || parsedQty < 1) {
+                    parsedQty = 1;
+                } else if (parsedQty > 99) {
+                    parsedQty = 99;
+                }
+
                 currentPayload = {
                     "Goods": [
                         {
@@ -621,7 +621,7 @@
                                 {
                                     "Device": "POS",
                                     "Barcode": isNaN(bc) || bc === "" ? bc : Number(bc),
-                                    "Quantity": qty
+                                    "Quantity": parsedQty
                                 }
                             ]
                         }
